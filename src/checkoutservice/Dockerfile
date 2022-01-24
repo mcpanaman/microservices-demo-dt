@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.17.5-alpine as builder
+FROM golang:1.15-alpine as builder
 RUN apk add --no-cache ca-certificates git
 RUN apk add build-base
 WORKDIR /src
@@ -24,8 +24,10 @@ RUN go mod download
 COPY . .
 
 # Skaffold passes in debug-oriented compiler flags
-ARG SKAFFOLD_GO_GCFLAGS
-RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
+#ARG SKAFFOLD_GO_GCFLAGS
+#RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
+# added ldflags for DT
+RUN go build -ldflags="-linkmode external" -o /checkoutservice .
 
 FROM alpine as release
 RUN apk add --no-cache ca-certificates
