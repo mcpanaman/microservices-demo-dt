@@ -59,12 +59,23 @@ module.exports = function charge (request) {
   const { amount, credit_card: creditCard } = request;
   const cardNumber = creditCard.credit_card_number;
   const cardInfo = cardValidator(cardNumber);
-  const {
+  var {
     card_type: cardType,
     valid
   } = cardInfo.getCardDetails();
 
   if (!valid) { throw new InvalidCreditCard(); }
+
+  if(process.env.WRONG_CARD_TYPE_FAILURE_RATE > 0) {
+    console.log("Random wrong card error enabled with failure rate " + process.env.WRONG_CARD_TYPE_FAILURE_RATE + "%.")
+    // Generate random number between 1 and 10
+    const rand =  Math.floor(Math.random() * 100) + 1;
+    if (rand <= process.env.WRONG_CARD_TYPE_FAILURE_RATE) {
+      cardType = 'AMEX';
+    }
+  } else {
+    console.log("Random wrong card error disabled.")
+  }
 
   // Only VISA and mastercard is accepted, other card types (AMEX, dinersclub) will
   // throw UnacceptedCreditCard error.

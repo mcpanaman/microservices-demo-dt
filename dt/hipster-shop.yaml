@@ -26,6 +26,10 @@ spec:
       app: emailservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: emailservice
     spec:
@@ -82,6 +86,10 @@ spec:
       app: checkoutservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: checkoutservice
     spec:
@@ -151,6 +159,10 @@ spec:
       app: recommendationservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: recommendationservice
     spec:
@@ -215,6 +227,9 @@ spec:
         app: frontend
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
     spec:
       serviceAccountName: default
       containers:
@@ -304,32 +319,119 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: paymentservice
+  name: paymentservice-v1
 spec:
   selector:
     matchLabels:
       app: paymentservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: paymentservice
+        app.kubernetes.io/version: 1.0.4
+        app.kubernetes.io/product: paymentservice
+        app.kubernetes.io/part-of: hipster-shop
+        app.kubernetes.io/stage: production
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: gcr.io/google-samples/microservices-demo/paymentservice:v0.3.5
+        image: ghcr.io/mcpanaman/paymentservice:0.4
         ports:
         - containerPort: 50051
         env:
         - name: PORT
           value: "50051"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/product']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_TRACING
           value: "1"
         - name: DISABLE_PROFILER
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
+        - name: WRONG_CARD_TYPE_FAILURE_RATE  # Failure rate with wrong card types in % between 0 and 100
+          value: "0"
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+--- # SECOND PAYMENTSERVICE TO SHOWCASE VERSIONING
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paymentservice-v2
+spec:
+  selector:
+    matchLabels:
+      app: paymentservice
+  template:
+    metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
+      labels:
+        app: paymentservice
+        app.kubernetes.io/version: 1.1.0
+        app.kubernetes.io/product: paymentservice
+        app.kubernetes.io/part-of: hipster-shop
+        app.kubernetes.io/stage: production
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: server
+        image: ghcr.io/mcpanaman/paymentservice:0.4
+        ports:
+        - containerPort: 50051
+        env:
+        - name: PORT
+          value: "50051"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/product']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
+        - name: DISABLE_TRACING
+          value: "1"
+        - name: DISABLE_PROFILER
+          value: "1"
+        - name: DISABLE_DEBUGGER
+          value: "1"
+        - name: WRONG_CARD_TYPE_FAILURE_RATE  # Failure rate with wrong card types in % between 0 and 100
+          value: "100"
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]
@@ -367,6 +469,10 @@ spec:
       app: productcatalogservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: productcatalogservice
     spec:
@@ -425,6 +531,10 @@ spec:
       app: cartservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: cartservice
     spec:
@@ -483,6 +593,9 @@ spec:
         app: loadgenerator
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -510,7 +623,7 @@ spec:
         - name: FRONTEND_ADDR
           value: "frontend:80"
         - name: USERS
-          value: "10"
+          value: "100"
         resources:
           requests:
             cpu: 300m
@@ -529,6 +642,10 @@ spec:
       app: currencyservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: currencyservice
     spec:
@@ -586,6 +703,10 @@ spec:
       app: shippingservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: shippingservice
     spec:
@@ -644,6 +765,10 @@ spec:
       app: redis-cart
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: redis-cart
     spec:
@@ -697,6 +822,10 @@ spec:
       app: adservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: adservice
     spec:
