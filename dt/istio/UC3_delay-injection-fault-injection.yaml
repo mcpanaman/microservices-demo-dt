@@ -1,0 +1,32 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: shipping-vs-delay-injection
+spec:
+  hosts:
+    - shippingservice
+  http:
+  - route:
+    - destination:
+        host: shippingservice
+    fault:
+      delay:
+        percent: 9
+        fixedDelay: 5s
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: payment-vs-fault-inj
+spec:
+  hosts:
+    - paymentservice
+  http:
+  - route:
+    - destination:
+        host: paymentservice
+    fault:
+      abort:
+        percentage:
+          value: 5
+        httpStatus: 503

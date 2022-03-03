@@ -10,11 +10,11 @@ spec:
     - destination:
         host: paymentservice.hipstershop.svc.cluster.local
         subset: currentversion
-      weight: 50
+      weight: 80
     - destination:
         host: paymentservice.hipstershop.svc.cluster.local
         subset: vnext
-      weight: 50
+      weight: 20
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
