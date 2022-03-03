@@ -33,6 +33,6 @@ Depending on the use-case you want to trigger, apply the respective yaml file:
  - UC2: Local Rate Limiting
  - UC3: Delay and Fault Injection
 ```
-kubectl apply -f dt/isto/UC*.yaml
+kubectl apply -f dt/istio/UC*.yaml
 ```
 UC* -> replace with Use-Case yaml file in folder dt/istio
