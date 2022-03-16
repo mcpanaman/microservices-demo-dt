@@ -1,26 +1,26 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: productcatalogservice
+  name: productcatalog-virtualservice
 spec:
   hosts:
-    - productcatalogservice
+    - productcatalog-k-service
   http:
   - route:
     - destination:
-        host: productcatalogservice
+        host: productcatalog-k-service
         subset: v1
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: productcatalogservice
+  name: productcatalog-dr
 spec:
-  host: productcatalogservice
+  host: productcatalog-k-service
   subsets:
   - name: v1
     labels:
-      app: productcatalogservice
+      app: productcatalogapp
     trafficPolicy:
       connectionPool:
         tcp:
@@ -29,7 +29,7 @@ spec:
           http1MaxPendingRequests: 1
           maxRequestsPerConnection: 1
       outlierDetection:
-        consecutive5xxErrors: 1
-        interval: 1s
-        baseEjectionTime: 3m
-        maxEjectionPercent: 100          
+         consecutive5xxErrors: 1
+         interval: 1s
+         baseEjectionTime: 3m
+         maxEjectionPercent: 100          
