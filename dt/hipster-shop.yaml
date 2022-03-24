@@ -26,8 +26,16 @@ spec:
       app: emailservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: emailservice
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: emailservice
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -39,6 +47,18 @@ spec:
         env:
         - name: PORT
           value: "8080"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_TRACING
           value: "1"
         - name: DISABLE_PROFILER
@@ -82,8 +102,16 @@ spec:
       app: checkoutservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: checkoutservice
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: checkoutservice
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       containers:
@@ -100,6 +128,18 @@ spec:
           env:
           - name: PORT
             value: "5050"
+          - name: DT_RELEASE_VERSION
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['app.kubernetes.io/version']
+          - name: DT_RELEASE_PRODUCT
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['app.kubernetes.io/name']
+          - name: DT_RELEASE_STAGE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['app.kubernetes.io/stage']
           - name: PRODUCT_CATALOG_SERVICE_ADDR
             value: "productcatalog-k-service:3550"
           - name: SHIPPING_SERVICE_ADDR
@@ -151,8 +191,16 @@ spec:
       app: recommendationservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: recommendationservice
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: recommendationservice
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -174,6 +222,18 @@ spec:
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
           value: "productcatalog-k-service:3550"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_TRACING
           value: "1"
         - name: DISABLE_PROFILER
@@ -211,10 +271,17 @@ spec:
       app: frontend
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
       labels:
         app: frontend
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: frontend
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       containers:
@@ -259,6 +326,18 @@ spec:
           # # When not set, defaults to "local" unless running in GKE, otherwies auto-sets to gcp 
           # - name: ENV_PLATFORM 
           #   value: "aws"
+          - name: DT_RELEASE_VERSION
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['app.kubernetes.io/version']
+          - name: DT_RELEASE_PRODUCT
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['app.kubernetes.io/name']
+          - name: DT_RELEASE_STAGE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['app.kubernetes.io/stage']
           - name: DISABLE_TRACING
             value: "1"
           - name: DISABLE_PROFILER
@@ -311,8 +390,16 @@ spec:
       app: paymentservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: paymentservice
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: paymentservice
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -324,6 +411,18 @@ spec:
         env:
         - name: PORT
           value: "50051"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_TRACING
           value: "1"
         - name: DISABLE_PROFILER
@@ -367,8 +466,16 @@ spec:
       app: productcatalogservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: productcatalogservice
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: productcatalogservice
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -380,6 +487,18 @@ spec:
         env:
         - name: PORT
           value: "3550"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_STATS
           value: "1"
         - name: DISABLE_TRACING
@@ -425,8 +544,16 @@ spec:
       app: cartservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: cartservice
+        app.kubernetes.io/version: 0.3.5
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: cartservice
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -438,6 +565,18 @@ spec:
         env:
         - name: REDIS_ADDR
           value: "redis-cart-k-service:6379"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         resources:
           requests:
             cpu: 200m
@@ -479,10 +618,17 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
       labels:
         app: loadgenerator
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: loadgenerator
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -511,6 +657,18 @@ spec:
           value: "frontend-k-service:80"
         - name: USERS
           value: "50"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         resources:
           requests:
             cpu: 300m
@@ -529,9 +687,17 @@ spec:
       app: currencyservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: currencyservice
         version: v0.3.6
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: currencyservice
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -544,6 +710,18 @@ spec:
         env:
         - name: PORT
           value: "7000"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_TRACING
           value: "1"
         - name: DISABLE_PROFILER
@@ -587,8 +765,16 @@ spec:
       app: shippingservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: shippingservice
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: shippingservice
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       containers:
@@ -599,6 +785,18 @@ spec:
         env:
         - name: PORT
           value: "50051"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_STATS
           value: "1"
         - name: DISABLE_TRACING
@@ -645,14 +843,35 @@ spec:
       app: redis-cart
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: redis-cart
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: redis-cart
+        app.kubernetes.io/part-of: online-boutique
     spec:
       containers:
       - name: redis
         image: redis:alpine
         ports:
         - containerPort: 6379
+        env:
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         readinessProbe:
           periodSeconds: 5
           tcpSocket:
@@ -698,8 +917,16 @@ spec:
       app: adservice
   template:
     metadata:
+      annotations:
+        metrics.dynatrace.com/path: /stats/prometheus
+        metrics.dynatrace.com/port: "15090"
+        metrics.dynatrace.com/scrape: "true"
       labels:
         app: adservice
+        app.kubernetes.io/version: 0.3.6
+        app.kubernetes.io/stage: production
+        app.kubernetes.io/name: adservice
+        app.kubernetes.io/part-of: online-boutique
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -711,6 +938,18 @@ spec:
         env:
         - name: PORT
           value: "9555"
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/name']
+        - name: DT_RELEASE_STAGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_STATS
           value: "1"
         - name: DISABLE_TRACING
