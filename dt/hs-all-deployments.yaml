@@ -340,7 +340,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: gcr.io/google-samples/microservices-demo/paymentservice:v0.3.6
+        image: ghcr.io/mcpanaman/paymentservice:v0.3.6
         ports:
         - containerPort: 50051
         env:
@@ -364,6 +364,8 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
+        - name: WRONG_CARD_TYPE_FAILURE_RATE  # Failure rate with wrong card types in % between 0 and 100
+          value: "0"
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]
