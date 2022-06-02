@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: checkout-vs
+spec:
+  hosts:
+    - checkout-k-service
+  http:
+  - route:
+    - destination:
+        host: checkout-k-service
+        subset: canary-v036
+      weight: 80
+    - destination:
+        host: checkout-k-service
+        subset: canary-v040
+      weight: 20
+---

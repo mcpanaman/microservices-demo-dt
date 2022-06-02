@@ -1,0 +1,63 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: payment-k-vs
+  namespace: bgdemo-green
+spec:
+  hosts:
+    - payment-k-service
+  http:
+  - route:
+    - destination:
+        host: payment-k-service
+        subset: v1
+    fault:
+      delay:
+        fixedDelay: 200ms
+        percentage:
+          value: 30
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: payment-dr
+  namespace: bgdemo-green
+spec:
+  host: payment-k-service
+  subsets:
+  - name: v1
+    labels:
+      app: paymentservice        
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: productcatalog-k-vs
+  namespace: bgdemo-green
+spec:
+  hosts:
+    - productcatalog-k-service
+  http:
+  - route:
+    - destination:
+        host: productcatalog-k-service
+        subset: v1
+    fault:
+      delay:
+        fixedDelay: 200ms
+        percentage:
+          value: 20
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: productcatalog-dr
+  namespace: bgdemo-green
+spec:
+  host: productcatalog-k-service
+  subsets:
+  - name: v1
+    labels:
+      app: productcatalogservice        
+---
+

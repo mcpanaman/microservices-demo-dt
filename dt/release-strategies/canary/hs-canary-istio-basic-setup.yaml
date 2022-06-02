@@ -1,0 +1,34 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: checkout-vs
+spec:
+  hosts:
+    - checkout-k-service
+  http:
+  - route:
+    - destination:
+        host: checkout-k-service
+        subset: canary-v036
+      weight: 100
+    - destination:
+        host: checkout-k-service
+        subset: canary-v040
+      weight: 0
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: checkout-dr
+spec:
+  host: checkout-k-service
+  subsets:
+  - name: canary-v036
+    labels:
+      app: checkoutservice
+      app.kubernetes.io/version: 0.3.6
+  - name: canary-v040
+    labels:
+      app: checkoutservice
+      app.kubernetes.io/version: 0.4.0
+---
