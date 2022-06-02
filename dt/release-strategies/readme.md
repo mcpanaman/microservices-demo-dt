@@ -24,7 +24,7 @@ kubectl label ns bgdemo-green istio-injection=enabled
 
 2. Dynatrace Product: Add Kubernetes rule to your Cloud Application and Workload Detection Settings
 This rule will make sure that workloads are merged across the two namespaces into the same process group and hence, Dynatrace Service. 
-![Screenshot of Dynatrace Cloud Application and Workload Detection Settings](./Dynatrace CAAWD K8s rule - bluegreen.png) 
+![Screenshot of Dynatrace Cloud Application and Workload Detection Settings](Dynatrace CAAWD K8s rule - bluegreen.png) 
 
 3. Deploy prod hipster-shop to namespace bgdemo-blue and deploy loadgenerator to namespace default
 ```
@@ -51,7 +51,44 @@ kubectl apply -f loadgen-green.yaml
 - Services will now be merged (blue/green) since STAGE is PROD for all of them
 - Traffic is shifted from blue to green namespace
 - Response time increased after deployment (since Istio was used for injection delay at paymentservice and productcatalogservice)
-- Use Multi-Dimensional-Analysis (metric: Response-time metric) and split by dimension ApplicationReleaseVersion 
+- Use Multi-Dimensional-Analysis (metric: Response-time) and split by dimension ApplicationReleaseVersion 
 
 
 ## Canary Deployment
+
+Scenario:
+Google's hipster-shop will be deployed in a namespace hipster-shop. A new version of microservices paymentservice and checkoutservice are available. Thus, a canary deployment will be triggered and 20% of the traffic shifted to the new version (via Istio). Dynatrace will show that error rate increased after the deployment and that this is tied to the new version. 
+
+1. Create Namespace
+```
+kubectl create ns hipster-shop
+kubectl label ns hipster-shop istio-injection=enabled
+```
+
+2. Dynatrace Product: Add (default) Kubernetes rule to your Cloud Application and Workload Detection Settings
+This rule will make sure that workloads are merged based on Namespace, container name, PRODUCT and STAGE. As a default rule (Namespace exists), it will be executed for any namespace given there is no applicable rule with a higher priority order. 
+![Screenshot of Dynatrace Cloud Application and Workload Detection Settings](Dynatrace CAAWD K8s rule - canary.png)
+
+3. Deploy prod hipster-shop 
+This deployment already includes the new version (0.4.0) of deployments (checkoutdeploy-canary-demo & paymentdeploy-canary-demo). However, traffic is 100% routed to version 0.3.6
+```
+kubectl apply -f hs-canary-all-deployments.yaml -n hipster-shop
+kubectl apply -f hs-canary-all-services.yaml -n hipster-shop
+kubectl apply -f hs-canary-istio-basic-setup.yaml -n hipster-shop
+```
+
+4. Review resulting services within Dynatrace
+Dynatrace will detect and merge service already (just 1 Checkoutservice/Paymentservice). However, just 1 service instance (0.3.6) will recevive traffic, respectively.
+
+5. Shift traffic to canaries
+```
+k apply -f hs-canary-istio-shift-traffic.yaml -n hipster-shop
+```
+
+7. Review and analyse what has changed within Dynatrace
+- No changes to service / process groups since they have already been merged
+- 2 service instances will receive traffic
+- Error rate will increase for checkoutservice 
+- Use Multi-Dimensional-Analysis (metric: error rate) and split by dimension ApplicationReleaseVersion to verify that errors are caused by version 0.4.0
+
+_Hint: Percentage of failed calls can be modified with Environment variable WRONG_CARD_TYPE_FAILURE_RATE of deployment paymentdeploy-canary-demo_
