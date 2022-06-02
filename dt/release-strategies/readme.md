@@ -28,23 +28,23 @@ This rule will make sure that workloads are merged across the two namespaces int
 
 3. Deploy prod hipster-shop to namespace bgdemo-blue and deploy loadgenerator to namespace default
 ```
-kubectl apply -f blue/ -n bgdemo-blue
-kubectl apply -f loadgen-blue.yaml
+kubectl apply -f blue-green/blue/ -n bgdemo-blue
+kubectl apply -f blue-green/loadgen-blue.yaml
 ```
 
 4. Deploy pre-prod hipster-shop to namespace bgdemo-green and generate some additional load towards this pre-prod environment
 ```
-kubectl apply -f green-preprod/ -n bgdemo-green
-kubectl apply -f loadgen-preprod-green.yaml
+kubectl apply -f blue-green/green-preprod/ -n bgdemo-green
+kubectl apply -f blue-green/loadgen-preprod-green.yaml
 ```
 5. Review resulting services within Dynatrace
 Dynatrace will detect and display different services for each namespace, since STAGE is included in the rule we have added in STEP 2 but differs between blue and green namespace (PROD vs. PREPROD)
 
 6. Release and Deploy v0.4.0 as new production version
 ```
-kubectl delete -f loadgen-preprod-green.yaml
-kubectl apply -f green/ -n bgdemo-green
-kubectl apply -f loadgen-green.yaml
+kubectl delete -f blue-green/loadgen-preprod-green.yaml
+kubectl apply -f blue-green/green/ -n bgdemo-green
+kubectl apply -f blue-green/loadgen-green.yaml
 ```
 
 7. Review and analyse what has changed within Dynatrace
@@ -67,14 +67,14 @@ kubectl label ns hipster-shop istio-injection=enabled
 
 2. Dynatrace Product: Add (default) Kubernetes rule to your Cloud Application and Workload Detection Settings
 This rule will make sure that workloads are merged based on Namespace, container name, PRODUCT and STAGE. As a default rule (Namespace exists), it will be executed for any namespace given there is no applicable rule with a higher priority order. 
-![Screenshot of Dynatrace Cloud Application and Workload Detection Settings](Dynatrace CAAWD K8s rule - canary.png)
+[![Screenshot of Dynatrace Cloud Application and Workload Detection Settings](Dynatrace CAAWD K8s rule - canary.png)](Dynatrace CAAWD K8s rule - canary.png)
 
 3. Deploy prod hipster-shop 
 This deployment already includes the new version (0.4.0) of deployments (checkoutdeploy-canary-demo & paymentdeploy-canary-demo). However, traffic is 100% routed to version 0.3.6
 ```
-kubectl apply -f hs-canary-all-deployments.yaml -n hipster-shop
-kubectl apply -f hs-canary-all-services.yaml -n hipster-shop
-kubectl apply -f hs-canary-istio-basic-setup.yaml -n hipster-shop
+kubectl apply -f canary/hs-canary-all-deployments.yaml -n hipster-shop
+kubectl apply -f canary/hs-canary-all-services.yaml -n hipster-shop
+kubectl apply -f canary/hs-canary-istio-basic-setup.yaml -n hipster-shop
 ```
 
 4. Review resulting services within Dynatrace
@@ -82,7 +82,7 @@ Dynatrace will detect and merge service already (just 1 Checkoutservice/Payments
 
 5. Shift traffic to canaries
 ```
-k apply -f hs-canary-istio-shift-traffic.yaml -n hipster-shop
+k apply -f canary/hs-canary-istio-shift-traffic.yaml -n hipster-shop
 ```
 
 7. Review and analyse what has changed within Dynatrace
