@@ -67,7 +67,9 @@ kubectl label ns hipster-shop istio-injection=enabled
 
 2. Dynatrace Product: Add (default) Kubernetes rule to your Cloud Application and Workload Detection Settings
 This rule will make sure that workloads are merged based on Namespace, container name, PRODUCT and STAGE. As a default rule (Namespace exists), it will be executed for any namespace given there is no applicable rule with a higher priority order. 
-[![Screenshot of Dynatrace Cloud Application and Workload Detection Settings](Dynatrace CAAWD K8s rule - canary.png)](Dynatrace CAAWD K8s rule - canary.png)
+<p align="center">
+<img src="Dynatrace_CAAWD_K8sRule_canary.png" width="300" alt="Online Boutique" />
+</p>
 
 3. Deploy prod hipster-shop 
 This deployment already includes the new version (0.4.0) of deployments (checkoutdeploy-canary-demo & paymentdeploy-canary-demo). However, traffic is 100% routed to version 0.3.6
