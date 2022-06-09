@@ -4,7 +4,7 @@ This folder contains 2 Kubernetes demo samples showcasing how a blue/green deplo
 
 Prerequisites:
 - K8s cluster up and running (e.g. GKE in a version supported by Dynatrace (Operator))
-- Dynatrace Operator with AG and OneAgents rolled out in full-stack mode
+- Dynatrace Operator with AG and OneAgents rolled out in classic full-stack mode
 - Istio (>=1.13) installed in this K8s cluster (e.g. default profile) 
 
 ## Blue/Green Deployment
