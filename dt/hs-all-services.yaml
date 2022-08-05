@@ -29,7 +29,10 @@ spec:
   ports:
   - name: grpc
     port: 5000
-    targetPort: 8080
+    targetPort: email-port
+  - name: test
+    port: 50053
+    targetPort: 3001
 ---
 apiVersion: v1
 kind: Service

@@ -158,15 +158,21 @@ func initJaegerTracing() {
 	// Register the Jaeger exporter to be able to retrieve
 	// the collected spans.
 	exporter, err := jaeger.NewExporter(jaeger.Options{
-		Endpoint: fmt.Sprintf("http://%s", svcAddr),
+		CollectorEndpoint: fmt.Sprintf("http://%s/api/traces", svcAddr),
 		Process: jaeger.Process{
-			ServiceName: "productcatalogservice",
+			ServiceName: "productcatalogservice.hipster-shop",
 		},
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 	trace.RegisterExporter(exporter)
+
+	// For demoing purposes, always sample. In a production application, you should
+	// configure this to a trace.ProbabilitySampler set at the desired
+	// probability.
+	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+
 	log.Info("jaeger initialization completed.")
 }
 
@@ -205,7 +211,7 @@ func initStackdriverTracing() {
 
 func initTracing() {
 	initJaegerTracing()
-	initStackdriverTracing()
+	//initStackdriverTracing()
 }
 
 func initProfiling(service, version string) {

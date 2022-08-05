@@ -29,7 +29,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: emailservice
         app.kubernetes.io/version: 0.3.6
@@ -43,7 +44,9 @@ spec:
       - name: server
         image: gcr.io/google-samples/microservices-demo/emailservice:v0.3.6
         ports:
-        - containerPort: 8080
+        - name: email-port
+          containerPort: 8080
+        - containerPort: 3001
         env:
         - name: PORT
           value: "8080"
@@ -60,7 +63,7 @@ spec:
             fieldRef:
               fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_TRACING
-          value: "1"
+          value: ""
         - name: DISABLE_PROFILER
           value: "1"
         readinessProbe:
@@ -92,7 +95,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: checkoutservice
         app.kubernetes.io/version: 0.3.6
@@ -103,7 +107,7 @@ spec:
       serviceAccountName: default
       containers:
         - name: server
-          image: ghcr.io/mcpanaman/checkoutservice:0.3.6
+          image: ghcr.io/mcpanaman/checkoutservice:0.3.6-jaeger
           ports:
           - containerPort: 5050
           readinessProbe:
@@ -140,13 +144,13 @@ spec:
           - name: CART_SERVICE_ADDR
             value: "cart-k-service:7070"
           - name: DISABLE_STATS
-            value: "1"
+            value: ""
           - name: DISABLE_TRACING
-            value: "1"
+            value: ""
           - name: DISABLE_PROFILER
             value: "1"
-          # - name: JAEGER_SERVICE_ADDR
-          #   value: "jaeger-collector:14268"
+          - name: JAEGER_SERVICE_ADDR
+            value: "jaeger-collector.istio-system:14268"
           resources:
             requests:
               cpu: 100m
@@ -168,7 +172,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: recommendationservice
         app.kubernetes.io/version: 0.3.6
@@ -209,7 +214,7 @@ spec:
             fieldRef:
               fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_TRACING
-          value: "1"
+          value: ""
         - name: DISABLE_PROFILER
           value: "1"
         - name: DISABLE_DEBUGGER
@@ -235,8 +240,9 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        oneagent.dynatrace.com/inject: "true"
       labels:
         app: frontend
         app.kubernetes.io/version: 0.3.6
@@ -247,7 +253,7 @@ spec:
       serviceAccountName: default
       containers:
         - name: server
-          image: ghcr.io/mcpanaman/frontend:0.3.6
+          image: ghcr.io/mcpanaman/frontend:0.3.6-jaeger
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -300,11 +306,11 @@ spec:
               fieldRef:
                 fieldPath: metadata.labels['app.kubernetes.io/stage']
           - name: DISABLE_TRACING
-            value: "1"
+            value: ""
           - name: DISABLE_PROFILER
             value: "1"
-          # - name: JAEGER_SERVICE_ADDR
-          #   value: "jaeger-collector:14268"
+          - name: JAEGER_SERVICE_ADDR
+            value: "jaeger-collector.istio-system:14268"
           # - name: CYMBAL_BRANDING
           #   value: "true"
           resources:
@@ -328,7 +334,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: paymentservice
         app.kubernetes.io/version: 0.3.6
@@ -359,13 +366,13 @@ spec:
             fieldRef:
               fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_TRACING
-          value: "1"
+          value: ""
         - name: DISABLE_PROFILER
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
         - name: WRONG_CARD_TYPE_FAILURE_RATE  # Failure rate with wrong card types in % between 0 and 100
-          value: "0"
+          value: "20"
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]
@@ -393,7 +400,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: productcatalogservice
         app.kubernetes.io/version: 0.3.6
@@ -405,7 +413,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: ghcr.io/mcpanaman/productcatalogservice:0.3.6
+        image: ghcr.io/mcpanaman/productcatalogservice:0.3.6-jaeger@sha256:6315feee99564f95009ce7c2869ea3774dd7948611fbb60e56e66373134d046c
         ports:
         - containerPort: 3550
         env:
@@ -424,13 +432,13 @@ spec:
             fieldRef:
               fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_STATS
-          value: "1"
+          value: ""
         - name: DISABLE_TRACING
-          value: "1"
+          value: ""
         - name: DISABLE_PROFILER
           value: "1"
-        # - name: JAEGER_SERVICE_ADDR
-        #   value: "jaeger-collector:14268"
+        - name: JAEGER_SERVICE_ADDR
+          value: "jaeger-collector.istio-system:14268"
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:3550"]
@@ -458,7 +466,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: cartservice
         app.kubernetes.io/version: 0.3.5
@@ -513,14 +522,15 @@ spec:
   selector:
     matchLabels:
       app: loadgenerator
-  replicas: 1
+  replicas: 0
   template:
     metadata:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: loadgenerator
         app.kubernetes.io/version: 0.3.6
@@ -554,7 +564,7 @@ spec:
         - name: FRONTEND_ADDR
           value: "frontend-k-service:80"
         - name: USERS
-          value: "50"
+          value: "5"
         - name: DT_RELEASE_VERSION
           valueFrom:
             fieldRef:
@@ -588,7 +598,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: currencyservice
         version: v0.3.6
@@ -621,11 +632,13 @@ spec:
             fieldRef:
               fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_TRACING
-          value: "1"
+          value: ""
         - name: DISABLE_PROFILER
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
+        - name: JAEGER_SERVICE_ADDR
+          value: "jaeger-collector.istio-system:9411"
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:7000"]
@@ -653,7 +666,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: shippingservice
         app.kubernetes.io/version: 0.3.6
@@ -664,7 +678,7 @@ spec:
       serviceAccountName: default
       containers:
       - name: server
-        image: ghcr.io/mcpanaman/shippingservice:0.3.6
+        image: ghcr.io/mcpanaman/shippingservice:0.3.6-jaeger@sha256:c2ecd803452db5232a4f0c3f3502c14e640bc0897ae26eec22e4e65656972977
         ports:
         - containerPort: 50051
         env:
@@ -683,13 +697,13 @@ spec:
             fieldRef:
               fieldPath: metadata.labels['app.kubernetes.io/stage']
         - name: DISABLE_STATS
-          value: "1"
+          value: ""
         - name: DISABLE_TRACING
-          value: "1"
+          value: ""
         - name: DISABLE_PROFILER
           value: "1"
-        # - name: JAEGER_SERVICE_ADDR
-        #   value: "jaeger-collector:14268"
+        - name: JAEGER_SERVICE_ADDR
+          value: "jaeger-collector.istio-system:14268"
         readinessProbe:
           periodSeconds: 5
           exec:
@@ -718,7 +732,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: redis-cart
         app.kubernetes.io/version: 1.0.0
@@ -779,7 +794,8 @@ spec:
       annotations:
         metrics.dynatrace.com/path: /stats/prometheus
         metrics.dynatrace.com/port: "15090"
-        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/scrape: "false"
+        oneagent.dynatrace.com/inject: "false"
       labels:
         app: adservice
         app.kubernetes.io/version: 0.3.6
@@ -812,9 +828,9 @@ spec:
         - name: DISABLE_STATS
           value: "1"
         - name: DISABLE_TRACING
-          value: "1"
-        # - name: JAEGER_SERVICE_ADDR
-        #   value: "jaeger-collector:14268"
+          value: ""
+        - name: JAEGER_SERVICE_ADDR
+          value: "jaeger-collector:14268"
         resources:
           requests:
             cpu: 200m

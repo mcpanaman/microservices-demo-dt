@@ -15,12 +15,26 @@
  * limitations under the License.
  *
  */
-require('@google-cloud/trace-agent').start();
+//require('@google-cloud/trace-agent').start();
 
 const path = require('path');
 const grpc = require('grpc');
 const leftPad = require('left-pad');
 const pino = require('pino');
+
+const {Tracer, ExplicitContext, ConsoleRecorder} = require('zipkin');
+const grpcInstrumentation = require('zipkin-instrumentation-grpc-client');
+// setup zipkin tracer
+const ctxImpl = new ExplicitContext();
+const recorder = new BatchRecorder({
+  logger: new HttpLogger({
+    endpoint: 'http://' + process.env.JAEGER_SERVICE_ADDR + '/api/v2/spans',
+    jsonEncoder: JSON_V2
+  })
+}); // batched http recorder
+const localServiceName = 'currencyservice'; // name of this application
+const tracer = new Tracer({ctxImpl, recorder, localServiceName});
+
 
 const PROTO_PATH = path.join(__dirname, './proto/demo.proto');
 const PORT = 7000;
@@ -28,6 +42,9 @@ const PORT = 7000;
 const shopProto = grpc.load(PROTO_PATH).hipstershop;
 const client = new shopProto.CurrencyService(`localhost:${PORT}`,
   grpc.credentials.createInsecure());
+
+const remoteServiceName = 'currencyservice';
+const interceptor = grpcInstrumentation(grpc, {tracer, remoteServiceName});
 
 const logger = pino({
   name: 'currencyservice-client',
@@ -49,7 +66,7 @@ function _moneyToString (m) {
   return `${m.units}.${m.nanos.toString().padStart(9,'0')} ${m.currency_code}`;
 }
 
-client.getSupportedCurrencies({}, (err, response) => {
+client.getSupportedCurrencies({},{ interceptors: [interceptor] }, (err, response) => {
   if (err) {
     logger.error(`Error in getSupportedCurrencies: ${err}`);
   } else {
@@ -57,7 +74,7 @@ client.getSupportedCurrencies({}, (err, response) => {
   }
 });
 
-client.convert(request, (err, response) => {
+client.convert(request, { interceptors: [interceptor] },(err, response) => {
   if (err) {
     logger.error(`Error in convert: ${err}`);
   } else {

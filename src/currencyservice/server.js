@@ -33,7 +33,35 @@ if(process.env.DISABLE_TRACING) {
 }
 else {
   console.log("Tracing enabled.")
-  require('@google-cloud/trace-agent').start();
+  // require('@google-cloud/trace-agent').start();
+  const {
+    Tracer,
+    BatchRecorder,
+    jsonEncoder: {JSON_V2}
+  } = require('zipkin');
+  const CLSContext = require('zipkin-context-cls');
+  const {HttpLogger} = require('zipkin-transport-http');
+  
+  
+
+  // Setup the tracer
+  const tracer = new Tracer({
+    ctxImpl: new CLSContext('zipkin'), // implicit in-process context
+    recorder: new BatchRecorder({
+      logger: new HttpLogger({
+        endpoint: 'http://' + process.env.JAEGER_SERVICE_ADDR + '/api/v2/spans',
+        jsonEncoder: JSON_V2
+      })
+    }), // batched http recorder
+    localServiceName: 'currencyservice' // name of this application
+  });
+  
+  // now use tracer to construct instrumentation! For example, fetch
+  const wrapFetch = require('zipkin-instrumentation-fetch');
+  
+  //const remoteServiceName = 'youtube'; // name of the application that
+                                       // will be called (optional)
+  const zipkinFetch = wrapFetch(fetch, {tracer}); //, remoteServiceName});
 }
 
 if(process.env.DISABLE_DEBUGGER) {

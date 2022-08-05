@@ -11,6 +11,7 @@ require (
 	go.opencensus.io v0.23.0
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	google.golang.org/grpc v1.43.0
+	github.com/openzipkin/zipkin-go/middleware/grpc v0.4.0
 )
 
 require (

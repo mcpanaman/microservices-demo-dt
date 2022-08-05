@@ -167,7 +167,7 @@ func initJaegerTracing(log logrus.FieldLogger) {
 	exporter, err := jaeger.NewExporter(jaeger.Options{
 		Endpoint: fmt.Sprintf("http://%s", svcAddr),
 		Process: jaeger.Process{
-			ServiceName: "frontend",
+			ServiceName: "frontend.hipster-shop",
 		},
 	})
 	if err != nil {
